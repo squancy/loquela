@@ -27,5 +27,5 @@ In the main text input field you can write:
   - `__custommode__` to use the words that the user added (the one that is stored in `localStorage`)
 
 ## Contribute
-If you have any questions or suggestions drop me with an emal at <a href="mailto:mark@pearscom.com">mailto:mark@pearscom.com</a>.<br>
+If you have any questions or suggestions drop me with an emal at <a href="mailto:mark@pearscom.com">mark@pearscom.com</a>.<br>
 For a hands on experience visit <a href="https://www.pearscom.com/loquela">pearscom.com/loquela</a>
