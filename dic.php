@@ -3,14 +3,8 @@
 <head>
 	<title>Loquela</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="description" content="Learn English and Hungarian with Wordic and improve your language skills day by day.">
+	<meta name="description" content="Makes learning foreign words fun.">
 	<link rel="icon" href="/images/wfav.png" type="image/x-icon"/>
-	<link rel="manifest" href="/manifest.json">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="red">
-    <meta name="apple-mobile-web-app-title" content="Pearscom">
-    <link rel="apple-touch-icon" href="/images/icons/icon-152x152.png">
-    <meta name="theme-color" content="#282828" />
 	<link rel="stylesheet" type="text/css" href="/style/style_lin.css">
 </head>
 <body>
