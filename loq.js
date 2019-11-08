@@ -35,6 +35,7 @@ txt.focus();
 
 // Set up the essential vars for later usage
 let words = [], correct = [], missed = [], sent = "", givenWord = "", lang = 0;
+let inSearchMode = false, beforeWord;
 
 // Check for localStorage empty, if true replace it with an empty array 
 if(localStorage.getItem("missed") == "") localStorage.setItem("missed", JSON.stringify(missed));
@@ -45,7 +46,8 @@ let localMissed = localStorage.getItem("missed");
 
 // Decide which storage to fetch
 let pairWord = "", mw = "", randoms = [];
-if(isMode == "custom") fetchArray(null);
+if(isMode == "search") toggleSearch(true, 'none', true);
+else if(isMode == "custom") fetchArray(null);
 else fetchArray("mwords.txt");
 
 // Fetch the Google Translate/Images svg pictures
@@ -67,9 +69,10 @@ fetch("sentence.txt")
 	});
 
 // Check for every keyup on the text field
-txt.addEventListener("keyup", () => {
+txt.addEventListener("input", () => {
     // Check to see if the value equals to the correct solution
-	if(txt.value.toLowerCase().replace(/\s/g, "") == givenWord.replace(/\s/g, "")){
+    let cleanTxt = txt.value.replace(/\s/g, '');
+	if(txt.value.toLowerCase().replace(/\s/g, "") == givenWord.replace(/\s/g, "") && !inSearchMode){
 		txt.value = "";
 		
 		// Push it to the correct array if does not exists yet
@@ -86,7 +89,7 @@ txt.addEventListener("keyup", () => {
 		if(sol.innerHTML != "") sol.innerHTML = "";
 		
 	// Check to see if markmode it started and do the setup
-	}else if(txt.value.toLowerCase() == "clearall"){
+	}else if(txt.value.toLowerCase() == "__clearall__"){
 	    txt.value = "";
 	    localStorage.clear();
 	}else if(txt.value.toLowerCase() == "__custommode__"){
@@ -95,8 +98,107 @@ txt.addEventListener("keyup", () => {
 	}else if(txt.value.toLowerCase() == "__defaultmode__"){
 	    txt.value = "";
 	    fetchArray("words.txt");
+	}else if(txt.value.toLowerCase() == "__search__"){
+	    txt.value = "";
+	    toggleSearch(true, 'none');
+	}else if(inSearchMode){
+	    performSearch(cleanTxt);
 	}
 });
+
+function toggleIcons(){
+    if(inSearchMode) toggleSearch(false, 'flex');
+    else toggleSearch(true, 'none');
+}
+
+function manageIcons(){
+    if(localStorage.getItem('customWords') && inSearchMode){
+        wtt.innerHTML += '<span id="searchHolder" onclick="toggleIcons()"><img src="/images/back_loq.svg"></span>';
+    }else if(localStorage.getItem('customWords')){
+        wtt.innerHTML += '<span id="searchHolder" onclick="toggleIcons()"><img src="/images/search_loq.svg"></span>';
+    }
+}
+
+if(isMode != "search") manageIcons();
+
+function toggleSearch(status, display, refresh = false){
+    let hideEls = document.getElementsByClassName('btnCollect');
+    for(let hideEl of Array.from(hideEls)){
+        hideEl.style.display = display;
+    }
+    if(refresh) fetchArray(null);
+    if(status){
+        localStorage.setItem('mode', 'search');
+        inSearchMode = true;
+        _('sentence').style.display = 'none';
+        beforeWord = _('wordToTrans').textContent;
+        _('wordToTrans').innerHTML = 'Search in your wordlist';
+        _('text').placeholder = 'Search for a word';
+    }else{
+        localStorage.setItem('mode', 'custom');
+        inSearchMode = false;
+        _('sentence').style.display = 'block';
+        _('wordToTrans').innerHTML = beforeWord;
+        _('text').placeholder = 'Write solution';
+    }
+    manageIcons();
+}
+
+function formatOutput(half, otherHalf, cleanTxt, result, precision){
+    let startInd = half.toLowerCase().indexOf(cleanTxt.toLowerCase());
+    let formatHalf = half.slice(0, startInd) + 
+                '<b>' + half.slice(startInd, startInd + cleanTxt.length) + '</b>'+ 
+                half.slice(startInd + cleanTxt.length);
+    result.push(otherHalf + '<span id="obscure">(' + formatHalf + ')</span>');
+    precision.push(cleanTxt.length / otherHalf.length * 100);
+}
+
+function performSearch(cleanTxt){
+    console.log(cleanTxt.length);
+    if(cleanTxt.length < 1){
+        _('searchOutput').innerHTML = '';
+        return;
+    }
+    // Get the content from localStorage
+    let rawData = JSON.parse(localStorage.getItem('customWords'));
+    let result = [];
+    let precision = [];
+    for(let el of rawData){
+        let leftHalf = el.split("#")[0];
+        let rightHalf = el.split("#")[1];
+        let regex = new RegExp(cleanTxt, 'gi');
+        let tmpRes = regex.exec(el);
+        if(tmpRes){
+            let hashtagPos = el.indexOf('#');
+            if(hashtagPos > tmpRes.index){
+                formatOutput(leftHalf, rightHalf, cleanTxt, result, precision);
+            }else{
+                formatOutput(rightHalf, leftHalf, cleanTxt, result, precision);
+            }
+        }
+        if(result.length == 5) break;
+    }
+    
+    if(result.length < 1){
+        _('searchOutput').innerHTML = '<div>No result found ...</div>';
+        return;
+    }
+    
+    // Provide a more efficient output to users
+    let finalOutput = [];
+    for(let i = 0; i < precision.length; i++){
+        let indexMax = precision.indexOf(Math.max(...precision));
+        finalOutput.push(result[indexMax]);
+        precision.splice(indexMax, 1);
+        i--;
+    }
+    
+    // Output result to UI
+    _('searchOutput').innerHTML = '';
+    for(let word of finalOutput){
+        _('searchOutput').innerHTML += '<div>' + word + '</div>';
+    }
+}
 
 /*function modeProperties(file, key, value){
     txt.value = "";
@@ -291,14 +393,13 @@ window.addEventListener("click", event => {
 
 // Add words to localStorage
 _("submitBtn").addEventListener('click', function addWords(e){
-    if(!/(?:\s*\w+\s*\-\s*\w+\s*(\,)?)*\s*\w+\s*\-\s*\w+\s*/.test(_("txtArea").value)){
+    if(!/(?:\s*\w+\s*\#\s*\w+\s*(\,)?)*\s*\w+\s*\#\s*\w+\s*/.test(_("txtArea").value)){
         _("statusText").innerText = 'Invalid input given';
         _("statusText").setAttribute('class', 'error');
         return;
     }
     let localWords = (_("txtArea").value)
-        .replace(/,\s+/g, ',').replace(/\s+\-\s+/, '-')
-        .replace(/\-/g, '#').split(',');
+        .replace(/,\s+/g, ',').replace(/\s+\-\s+/, '-').split(',');
     _("txtArea").value = "";
     _("statusText").innerText = 'Wordlist has been successfully added';
     _("statusText").setAttribute('class', 'success');
@@ -306,9 +407,11 @@ _("submitBtn").addEventListener('click', function addWords(e){
         let wordsSoFar = JSON.parse(localStorage.getItem('customWords'));
         localWords.push(...wordsSoFar);
     }
+    
     localStorage.setItem('customWords', JSON.stringify(localWords));
+    let beforeMode = localStorage.getItem('mode');
     localStorage.setItem('mode', 'custom');
-    console.log(localWords, words);
+    if(beforeMode == 'default') fetchArray(null);
     words = localWords;
 });
 
