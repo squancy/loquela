@@ -134,12 +134,14 @@ function toggleSearch(status, display, refresh = false){
         beforeWord = _('wordToTrans').textContent;
         _('wordToTrans').innerHTML = 'Search in your wordlist';
         _('text').placeholder = 'Search for a word';
+        _('searchOutput').style.display = 'block';
     }else{
         localStorage.setItem('mode', 'custom');
         inSearchMode = false;
         _('sentence').style.display = 'block';
         _('wordToTrans').innerHTML = beforeWord;
         _('text').placeholder = 'Write solution';
+        _('searchOutput').style.display = 'none';
     }
     manageIcons();
 }
@@ -150,7 +152,68 @@ function formatOutput(half, otherHalf, cleanTxt, result, precision){
                 '<b>' + half.slice(startInd, startInd + cleanTxt.length) + '</b>'+ 
                 half.slice(startInd + cleanTxt.length);
     result.push(otherHalf + '<span id="obscure">(' + formatHalf + ')</span>');
-    precision.push(cleanTxt.length / otherHalf.length * 100);
+    precision.push(cleanTxt.length / otherHalf.length);
+}
+
+function formatSim(left, txt){
+    let startIndex = 0;
+    let result = '';
+    for(let char of left){
+        if(txt.indexOf(char, startIndex) > -1){
+            result += '<b>' + char + '</b>';
+        }else{
+            result += char;
+        }
+    }
+    return result
+}
+
+function doInner(half, otherHalf, txt, result, precision){
+    half = formatSim(half, txt);
+    for(let el of result){
+        if(el.indexOf(otherHalf) > -1) return;
+    }
+    result.push(otherHalf + '<span id="obscure">(' + half + ')</span>');
+    precision.push(txt.length / half.length);
+}
+
+function similarSearch(data, txt, result, precision){
+    let trackedAlready = [];
+    for(let el of data){
+        let leftHalf = el.split("#")[0];
+        let rightHalf = el.split('#')[1];
+        let dist1 = levDist(leftHalf.slice(0, txt.length), txt);
+        let dist2 = levDist(rightHalf.slice(0, txt.length), txt);
+        if(dist1 / txt.length < 0.5){
+            doInner(leftHalf, rightHalf, txt, result, precision);
+        }else if(dist2 / txt.length < 0.5){
+            doInner(rightHalf, leftHalf, txt, result, precision);
+        }
+        if(result.length == 5) break;
+    }
+    return result;
+}
+
+// Implement levenshtein distance
+function levDist(str1, str2){
+    var m = [], i, j, min = Math.min;
+
+    if (!(str1 && str1)) return (str1 || str2).length;
+
+    for (i = 0; i <= str2.length; m[i] = [i++]);
+    for (j = 0; j <= str1.length; m[0][j] = j++);
+
+    for (i = 1; i <= str2.length; i++) {
+        for (j = 1; j <= str1.length; j++) {
+            m[i][j] = str2.charAt(i - 1) == str1.charAt(j - 1)
+                ? m[i - 1][j - 1]
+                : m[i][j] = min(
+                    m[i - 1][j - 1] + 1, 
+                    min(m[i][j - 1] + 1, m[i - 1 ][j] + 1))
+        }
+    }
+    
+    return m[str2.length][str1.length];
 }
 
 function performSearch(cleanTxt){
@@ -168,7 +231,6 @@ function performSearch(cleanTxt){
         let rightHalf = el.split("#")[1];
         let regex = new RegExp(cleanTxt, 'gi');
         let tmpRes = regex.exec(el);
-        console.log()
         if(tmpRes){
             let hashtagPos = el.indexOf('#');
             if(hashtagPos > tmpRes.index){
@@ -178,6 +240,11 @@ function performSearch(cleanTxt){
             }
         }
         if(result.length == 5) break;
+    }
+    
+    if(result.length < 5){
+        let x = similarSearch(rawData, cleanTxt, result, precision);
+        result.push(...x);
     }
     
     if(result.length < 1){
