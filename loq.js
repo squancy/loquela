@@ -194,7 +194,7 @@ function similarSearch(data, txt, result, precision){
     return result;
 }
 
-// Implement levenshtein distance
+// Implement levensthein distance
 function levDist(str1, str2){
     var m = [], i, j, min = Math.min;
 
