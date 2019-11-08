@@ -168,6 +168,7 @@ function performSearch(cleanTxt){
         let rightHalf = el.split("#")[1];
         let regex = new RegExp(cleanTxt, 'gi');
         let tmpRes = regex.exec(el);
+        console.log()
         if(tmpRes){
             let hashtagPos = el.indexOf('#');
             if(hashtagPos > tmpRes.index){
@@ -190,6 +191,7 @@ function performSearch(cleanTxt){
         let indexMax = precision.indexOf(Math.max(...precision));
         finalOutput.push(result[indexMax]);
         precision.splice(indexMax, 1);
+        result.splice(indexMax, 1);
         i--;
     }
     
@@ -413,6 +415,7 @@ _("submitBtn").addEventListener('click', function addWords(e){
     localStorage.setItem('mode', 'custom');
     if(beforeMode == 'default') fetchArray(null);
     words = localWords;
+    toggleSearch(false, 'flex');
 });
 
 // Check for browser/device width to apply some specific CSS
