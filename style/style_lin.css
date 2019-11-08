@@ -17,6 +17,32 @@ body{
 	box-sizing: border-box;
 }
 
+#obscure{
+    opacity: 0.7;
+    margin-left: 5px;
+}
+
+#searchOutput{
+    margin-top: 10px;
+    font-size: 16px;
+}
+
+#searchHolder{
+    margin-left: 5px;
+}
+
+#searchHolder > img{
+    width: 24px;
+    height: 24px;
+    margin-bottom: -5px;
+    cursor: pointer;
+}
+
+#searchOutput > div{
+    text-align: center;
+    padding: 5px;
+}
+
 .add{
     justify-content: space-evenly;
     align-items: flex-end;
