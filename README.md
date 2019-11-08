@@ -25,6 +25,8 @@ When playing with the source code please account for this change.
 In the main text input field you can write:
   - `__defaultmode__` to use the default file (currently `words.txt`) as an input
   - `__custommode__` to use the words that the user added (the one that is stored in `localStorage`)
+  - `__clearall__` to clear the `localStorage` thereby losing all the words the user has added so far (basically runs `localStorage.clear()`)
+  - `__search__` to search in the wordlist that the user added (click on the search icon to achieve the same effect)
 
 ## Contribute
 If you have any questions or suggestions drop me with an emal at <a href="mailto:mark@pearscom.com">mark@pearscom.com</a>.<br>
