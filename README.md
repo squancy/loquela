@@ -8,7 +8,7 @@ If the user does not know the answer they can check it by clicking the <b>Show s
 
 When first using Loquela a default wordlist (currently `words.txt`</b>) will serve as a data source but the user has the ability to add their own words later on.
 
-The user can also check their <b>correct words</b> and <b>missed words</b>.
+The user can also check their <b>correct words</b> and <b>missed words</b> and also has the ability to search in their wordlist they added.
 
 ## Implementation
 Loquela uses the `fetch API` available in ES6 to fetch local files on the server and the `Promise API` for utilization.<br>
