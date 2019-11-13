@@ -27,6 +27,12 @@ In the main text input field you can write:
   - `__custommode__` to use the words that the user added (the one that is stored in `localStorage`)
   - `__clearall__` to clear the `localStorage` thereby losing all the words the user has added so far (basically runs `localStorage.clear()`)
   - `__search__` to search in the wordlist that the user added (click on the search icon to achieve the same effect)
+  
+## Nice TODOs
+  - Also show images when asking a word
+  - Example sentences in multiple languages (currently only in English) & grant fast access to them
+  - Might involve the server side as well (currently it only operates on client side)
+  - anything you think would be great ...
 
 ## Contribute
 If you have any questions or suggestions drop me with an email at <a href="mailto:mark@pearscom.com">mark@pearscom.com</a>.<br>
