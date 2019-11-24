@@ -48,7 +48,7 @@ let localMissed = localStorage.getItem("missed");
 let pairWord = "", mw = "", randoms = [];
 if(isMode == "search") toggleSearch(true, 'none', true);
 else if(isMode == "custom") fetchArray(null);
-else fetchArray("mwords.txt");
+else fetchArray("words.txt");
 
 // Fetch the Google Translate/Images svg pictures
 let googleImage = googleTrans = "";
@@ -478,11 +478,9 @@ _("submitBtn").addEventListener('click', function addWords(e){
     }
     
     localStorage.setItem('customWords', JSON.stringify(localWords));
-    let beforeMode = localStorage.getItem('mode');
     localStorage.setItem('mode', 'custom');
-    if(beforeMode == 'default') fetchArray(null);
     words = localWords;
-    toggleSearch(false, 'flex');
+    // toggleSearch(false, 'flex');
 });
 
 // Check for browser/device width to apply some specific CSS
