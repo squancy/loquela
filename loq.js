@@ -152,7 +152,7 @@ function formatOutput(half, otherHalf, cleanTxt, result, precision){
                 '<b>' + half.slice(startInd, startInd + cleanTxt.length) + '</b>'+ 
                 half.slice(startInd + cleanTxt.length);
     result.push(otherHalf + '<span id="obscure">(' + formatHalf + ')</span>');
-    precision.push(cleanTxt.length / otherHalf.length);
+    precision.push(cleanTxt.length / half.length);
 }
 
 function formatSim(left, txt){
@@ -216,8 +216,16 @@ function levDist(str1, str2){
     return m[str2.length][str1.length];
 }
 
+function performOutput(el, res, leftHalf, rightHalf, cleanTxt, result, precision){
+    let hashtagPos = el.indexOf('#');
+    if(hashtagPos > res.index){
+        formatOutput(leftHalf, rightHalf, cleanTxt, result, precision);
+    }else{
+        formatOutput(rightHalf, leftHalf, cleanTxt, result, precision);
+    }
+}
+
 function performSearch(cleanTxt){
-    console.log(cleanTxt.length);
     if(cleanTxt.length < 1){
         _('searchOutput').innerHTML = '';
         return;
@@ -229,17 +237,18 @@ function performSearch(cleanTxt){
     for(let el of rawData){
         let leftHalf = el.split("#")[0];
         let rightHalf = el.split("#")[1];
-        let regex = new RegExp(cleanTxt, 'gi');
-        let tmpRes = regex.exec(el);
-        if(tmpRes){
-            let hashtagPos = el.indexOf('#');
-            if(hashtagPos > tmpRes.index){
-                formatOutput(leftHalf, rightHalf, cleanTxt, result, precision);
-            }else{
-                formatOutput(rightHalf, leftHalf, cleanTxt, result, precision);
-            }
+        let regexCont = new RegExp(cleanTxt, 'gi');
+        let regexBegin = new RegExp('^' + cleanTxt, 'gi');
+        let tmpRes = regexCont.exec(el);
+        let tmpBeg = regexBegin.exec(el);
+        
+        // Prefer the word that starts with the input not just contains it
+        if(tmpBeg){
+            performOutput(el, tmpBeg, leftHalf, rightHalf, cleanTxt, result, precision);
+        }else if(tmpRes){
+         performOutput(el, tmpRes, leftHalf, rightHalf, cleanTxt, result, precision);   
         }
-        if(result.length == 5) break;
+       if(result.length == 10) break;
     }
     
     if(result.length < 5){
@@ -430,7 +439,6 @@ function showSent(){
 	if(is >= 0) x = sent.slice(is - 40, is + 40);
 	x = x.replace(/%/g, "").replace(/(\w+)(\.|\?|"|!)(\w+)+/g, "$1$2 $3").replace(reg, "<b>$1</b>");
 	if(x != "") x = "..." + x + "..."; else x = "Unfortunately, no example sentence can be found ...";
-	console.log(wordToFind, x);
 	sen.innerHTML = x;
 }
 
