@@ -19,6 +19,7 @@ Therefore when executing `localStorage.clear()` in DevTools or clearing the cach
 ## Example sentences
 When Loquela is asking an [english word]'s counterpart it will search a large text file (`xaa.txt` and `xab.txt`) for an example sentence in English with the given word in it.<br>
 The search is done with JavaScript's `RegExp` object and once the files are fetched the search takes around 0.1 seconds complete.<br>
+The file contains around 700,000 English sentences, each is about 6-8 words long.<br>
 <b>Note:</b> in the source code the name of the file containing the sentences is `sentence.txt` but since it is quite large (around 45MB) it is split into two halves (`xaa.txt` and `xab.txt`).<br>
 When playing with the source code please account for this change.
 
