@@ -23,7 +23,7 @@ The search is done with JavaScript's `RegExp` object and once the files are fetc
 When playing with the source code please account for this change.
 
 ## Adding custom words
-You can add any pair of words separated by a `#` in the form of foreign word<sub>1</sub>#word1, ... ,foreign wordn#wordn. 
+You can add any pair of words separated by a `#` in the form of <i>foreign word<sub>1</sub>#word1, ... ,foreign word<sub>n</sub>#word<sub>n</sub>.</i> 
 
 ## Commands
 In the main text input field you can write:
