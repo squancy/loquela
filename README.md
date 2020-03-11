@@ -1,4 +1,4 @@
-# loquela
+# Loquela
 A service that helps you to learn foreign words faster.
 
 
