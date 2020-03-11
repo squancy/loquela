@@ -44,8 +44,14 @@ let inSearchMode = false,
  beforeWord;
 
 // Check for localStorage empty, if true replace it with an empty array 
-if (localStorage.getItem("missed") == "") localStorage.setItem("missed", JSON.stringify(missed));
-if (localStorage.getItem("correct") == "") localStorage.setItem("correct", JSON.stringify(correct));
+if (!localStorage.getItem("missed")) {
+  localStorage.setItem("missed", JSON.stringify(missed));
+}
+
+if (!localStorage.getItem("correct")) {
+  localStorage.setItem("correct", JSON.stringify(correct));
+}
+
 let isMode = localStorage.getItem("mode");
 let localCorrect = localStorage.getItem("correct");
 let localMissed = localStorage.getItem("missed");
@@ -60,8 +66,10 @@ else fetchArray("words.txt");
 
 // Fetch the Google Translate/Images svg pictures
 let googleImage = googleTrans = "";
-fetch("https://upload.wikimedia.org/wikipedia/commons/d/d7/Google_Translate_logo.svg").then(res => res.text()).then(x => googleTrans = x);
-fetch("https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg").then(res => res.text()).then(x => googleImage = x);
+fetch("https://upload.wikimedia.org/wikipedia/commons/d/d7/Google_Translate_logo.svg")
+  .then(res => res.text()).then(x => googleTrans = x);
+fetch("https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg")
+  .then(res => res.text()).then(x => googleImage = x);
 
 // Fetch the example sentence database for later use to display sentences only in English
 sen.innerHTML = '<img src="/images/lq_load.gif">';
@@ -80,7 +88,8 @@ fetch("sentence.txt")
 txt.addEventListener("input", () => {
  // Check to see if the value equals to the correct solution
  let cleanTxt = txt.value.replace(/\s/g, '');
- if (txt.value.toLowerCase().replace(/\s/g, "") == givenWord.replace(/\s/g, "") && !inSearchMode) {
+ if (txt.value.toLowerCase().replace(/\s/g, "") == givenWord.replace(/\s/g, "") &&
+  !inSearchMode) {
   txt.value = "";
 
   // Push it to the correct array if does not exists yet
@@ -88,10 +97,13 @@ txt.addEventListener("input", () => {
    correct.push(givenWord);
   }
 
-  // Append it to the "correct" localStorage (appendLS is a custom function for appending a new element to an existing localStorage)
+  /*
+    Append it to the "correct" localStorage (appendLS is a custom function for appending a
+    new * element to an existing localStorage)
+  */
   appendLS("correct", givenWord);
 
-  if (lang == 0) showSent();
+  if (!lang) showSent();
   givenWord = newWord();
   sen.innerHTML = "";
   if (sol.innerHTML != "") sol.innerHTML = "";
@@ -121,9 +133,17 @@ function toggleIcons() {
 
 function manageIcons() {
  if (localStorage.getItem('customWords') && inSearchMode) {
-  wtt.innerHTML += '<span id="searchHolder" onclick="toggleIcons()"><img src="/images/back_loq.svg"></span>';
+  wtt.innerHTML += `
+    <span id="searchHolder" onclick="toggleIcons()">
+      <img src="/images/back_loq.svg">
+    </span>
+  `;
  } else if (localStorage.getItem('customWords')) {
-  wtt.innerHTML += '<span id="searchHolder" onclick="toggleIcons()"><img src="/images/search_loq.svg"></span>';
+  wtt.innerHTML += `
+    <span id="searchHolder" onclick="toggleIcons()">
+      <img src="/images/search_loq.svg">
+    </span>
+  `;
  }
 }
 
@@ -287,12 +307,6 @@ function performSearch(cleanTxt) {
  }
 }
 
-/*function modeProperties(file, key, value){
-    txt.value = "";
-	fetchArray(file);
-	localStorage.setItem(key, value);
-}*/
-
 // Event listener for button click on showing the solution
 sho.addEventListener("click", showSol);
 
@@ -386,7 +400,10 @@ function getLang() {
  return false;
 }
 
-// Logic for pseudo-randomly select a word with special attention to that two exact same words in the same lanuage cannot be after each other
+/*
+  Logic for pseudo-randomly select a word with special attention to that two exact same words
+  * in the same lanuage cannot be after each other
+*/
 function makeRand() {
  if (randoms.length == words.length) randoms = [];
  let randomElement = Math.floor(Math.random() * words.length);
@@ -412,7 +429,8 @@ function showBtn(field, btn, array) {
   }
   for (let c of array) {
    let [lng, lngRev] = getLang();
-   field.innerHTML += "<a href='https://translate.google.com/#" + lng + "/" + lngRev + "/" + c + "' target='_blank'>" + c + "</a><br>";
+   field.innerHTML += "<a href='https://translate.google.com/#" + lng + "/" + lngRev + "/" +
+    c + "' target='_blank'>" + c + "</a><br>";
    btn.setAttribute("data-show", "true");
   }
  } else {
@@ -448,7 +466,8 @@ function showSent() {
   x = "",
   reg = new RegExp("(" + wordToFind + ")", "gi");
  if (is >= 0) x = sent.slice(is - 40, is + 40);
- x = x.replace(/%/g, "").replace(/(\w+)(\.|\?|"|!)(\w+)+/g, "$1$2 $3").replace(reg, "<b>$1</b>");
+ x = x.replace(/%/g, "")
+  .replace(/(\w+)(\.|\?|"|!)(\w+)+/g, "$1$2 $3").replace(reg, "<b>$1</b>");
  if (x != "") x = "..." + x + "...";
  else x = "Unfortunately, no example sentence can be found ...";
  sen.innerHTML = x;
@@ -472,7 +491,10 @@ function flattenDeep(arr1) {
  return arr1.reduce((acc, val) => Array.isArray(val) ? acc.concat(flattenDeep(val)) : acc.concat(val), []);
 }
 
-// Making sure that once we click outside of a certain box (e.g.: div of correct words) it vanishes
+/*
+  Making sure that once we click outside of a certain box (e.g.: div of correct words) it
+  vanishes
+*/
 window.addEventListener("click", event => {
  if ((event.srcElement.tagName == "DIV" || event.srcElement.tagName == "HTML")) {
   cot.innerHTML = mit.innerHTML = sol.innerHTML = "";
@@ -500,7 +522,6 @@ _("submitBtn").addEventListener('click', function addWords(e) {
  localStorage.setItem('customWords', JSON.stringify(localWords));
  localStorage.setItem('mode', 'custom');
  words = localWords;
- // toggleSearch(false, 'flex');
 });
 
 // Check for browser/device width to apply some specific CSS
